@@ -1,61 +1,94 @@
-from flask import Flask, render_template, jsonify
-from flask_jwt_extended import JWTManager, create_access_token
+from flask import Flask, render_template
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt
 from api import api
 # from api.routes import example
 # from api.routes.example import router_bp_example
-
+from datetime import timedelta
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
 import os
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()  # Load environment variables from .env file
+
+
 def create_app():
-        app = Flask(__name__)
+    app = Flask(__name__)
 
-    # Load configuration from a config file or environment variables
-        app.config.from_mapping(
-            SECRET_KEY='your_secret_key',
-            JWT_SECRET_KEY='your_jwt_secret_key',  # Change this to a secure key
-            JWT_ACCESS_TOKEN_EXPIRES=3600,  # Token expiration time in seconds
-            # Add other configurations here
-        )
-        # Initialize JWT Manager
-        JWTManager(app)
-        
-        @app.route('/login', methods=['POST'])
-        def login():
-            #
-            # More complex login logic would go here
-            #
-            # For demonstration, we create a token for a user
-            access_token = create_access_token(identity="user_id")
-            return jsonify(access_token=access_token), 201
+# Load configuration from a config file or environment variables
+    app.config.from_mapping(
+        DEBUG=os.getenv('APP_DEBUG', True),  # Set to True for development
+        TESTING=os.getenv('APP_TESTING', False),  # Set to True for testing
+        # Change this to a secure key
+        SECRET_KEY=os.getenv('SECRET_KEY', 'your_secret_key'),
+        # Change this to a secure key
+        JWT_SECRET_KEY=os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key'),
+        # Token expiration time in seconds
+        JWT_ACCESS_TOKEN_EXPIRES=timedelta(seconds=int(
+            os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600))),
+        JWT_BLACKLIST_ENABLED=os.getenv(
+            'JWT_BLACKLIST_ENABLED', True),
+        # Token checks
+        JWT_BLACKLIST_TOKEN_CHECKS=os.getenv(
+            'JWT_BLACKLIST_TOKEN_CHECKS', [
+                # 'access' and 'refresh' are the default checks
+                'access', 'refresh'
+            ]),
+        # Refresh token expiration time in seconds
+        JWT_REFRESH_TOKEN_EXPIRES=timedelta(seconds=int(os.getenv(
+            'JWT_REFRESH_TOKEN_EXPIRES', 86400))),        # Enable token blacklist
 
-    # Register the APIs blueprint    
-        app.register_blueprint(api)
-        
-        # Additional example routes can be registered here if needed
-        # Uncomment one of the following lines to register example routes
+        # Add other configurations here
+        # ... e.g., database URI, etc.
+    )
+    # Initialize JWT Manager
+    jwt = JWTManager(app)
+    jwt_blacklist = set()
 
-        # Method 1: Register the example routes directly using the blueprint
-        ### Uncomment to register example routes directly
-        # app.register_blueprint(example.router_bp_example, url_prefix='/api')
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        """Check if the token is revoked."""
+        # The 'jti' (JWT ID) is a unique identifier for the token
+        # You can store revoked tokens in a database or in-memory set
+        # Here we use an in-memory set for simplicity
+        # In a real application, you would check against a persistent store
+        jti = jwt_payload["jti"]
+        return jti in jwt_blacklist
+    
+    @app.post('/api/v1/auth/logout')
+    @jwt_required()
+    def logout():
+        jti = get_jwt()["jti"]
+        jwt_blacklist.add(jti)
+        return {"msg": "Token revocato"}, 200
 
-        # Method 2: Register the example routes using the blueprint
-        ### Uncomment to register example routes using the blueprint
-        # app.register_blueprint(router_bp_example, url_prefix='/api')
+# Register the APIs blueprint
+    app.register_blueprint(api)
 
-        return app
+    # Additional example routes can be registered here if needed
+    # Uncomment one of the following lines to register example routes
+
+    # Method 1: Register the example routes directly using the blueprint
+    # Uncomment to register example routes directly
+    # app.register_blueprint(example.router_bp_example, url_prefix='/api')
+
+    # Method 2: Register the example routes using the blueprint
+    # Uncomment to register example routes using the blueprint
+    # app.register_blueprint(router_bp_example, url_prefix='/api')
+
+    return app
 
 
 app = create_app()
 
 
-@app.route('/')
+# Initialize default routes
+@app.get('/')
 def index():
     routes = []
     for rule in app.url_map.iter_rules():
+        if rule.endpoint in ['index']:
+            continue
         routes.append({
             "url": str(rule),
             "methods": list(rule.methods),

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, url_for
 from flask_jwt_extended import jwt_required
 
-router_bp_other = Blueprint('other', __name__, url_prefix='/other')
+router_bp_other = Blueprint('other', __name__)
 
 # Define your API routes here
 @router_bp_other.route('/other', methods=['GET'])
