@@ -34,9 +34,9 @@
         <tbody>
             {% for route in routes %}
             <tr>
-                <td style="width: 20%;">{{ route.endpoint }}</td>
-                <td style="width: 70%;">{{ route.url }}</td>
-                <td style="width: 10%;">{{ route.methods| sort | join(', ') }}</td>
+                <td style="width: 30%;">{{ route.endpoint }}</td>
+                <td style="width: 50%;">{{ route.url }}</td>
+                <td style="width: 20%;">{{ route.methods| sort | join(', ') }}</td>
             </tr>
             {% endfor %}
         </tbody>

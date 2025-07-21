@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
 from api import api
 # from api.routes import example
@@ -42,8 +42,9 @@ def create_app():
         # ... e.g., database URI, etc.
     )
     # Initialize JWT Manager
-    jwt = JWTManager(app)
-    jwt_blacklist = set()
+    jwt = JWTManager(app) 
+    # Make blacklist available in the app context
+    app.config['jwt_blacklist'] = set()
 
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
@@ -53,14 +54,8 @@ def create_app():
         # Here we use an in-memory set for simplicity
         # In a real application, you would check against a persistent store
         jti = jwt_payload["jti"]
-        return jti in jwt_blacklist
-    
-    @app.post('/api/v1/auth/logout')
-    @jwt_required()
-    def logout():
-        jti = get_jwt()["jti"]
-        jwt_blacklist.add(jti)
-        return {"msg": "Token revocato"}, 200
+        # Check if the token ID is in the blacklist
+        return jti in app.config['jwt_blacklist']
 
 # Register the APIs blueprint
     app.register_blueprint(api)

@@ -7,9 +7,9 @@ router_bp_other = Blueprint('other', __name__)
 @router_bp_other.route('/other', methods=['GET'])
 def other_route():
     """GET /api/other/
-    Other route that returns a simple message.
+    Other route that returns a simple msg.
     """
-    return jsonify({"message": "This is an other route."})
+    return jsonify({"msg": "This is an other route."})
 
 @router_bp_other.route('/other', methods=['POST'])
 @jwt_required()
@@ -19,7 +19,7 @@ def create_other():
     Requires JWT authentication.
     """
     data = request.get_json()
-    return jsonify({"message": "Other created.", "data": data}), 201
+    return jsonify({"msg": "Other created.", "data": data}), 201
 
 @router_bp_other.route('/other/<int:id>', methods=['GET'])
 @jwt_required()
@@ -28,7 +28,7 @@ def get_other(id):
     Other route to retrieve an other resource by ID.
     Requires JWT authentication.
     """
-    return jsonify({"message": f"Retrieved other with id {id}."})
+    return jsonify({"msg": f"Retrieved other with id {id}."})
 
 @router_bp_other.route('/other/<int:id>', methods=['DELETE'])
 @jwt_required()
@@ -37,4 +37,4 @@ def delete_other(id):
     Other route to delete an other resource by ID.
     Requires JWT authentication.
     """
-    return jsonify({"message": f"Deleted other with id {id}."})
+    return jsonify({"msg": f"Deleted other with id {id}."})

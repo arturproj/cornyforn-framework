@@ -5,16 +5,18 @@ This is a simple Flask API application that demonstrates how to structure a Flas
 ## Project Structure
 
 ```
-flask-api-app
 ├── src
-│   ├── __init__.py
 │   ├── app.py
 │   ├── api
 │   │   ├── __init__.py
 │   │   └── routes
-│   └── models
-│       └── __init__.py
+│   │       └── __init__.py
+│   ├── models
+│   |   └── __init__.py
+│   └── templates
+│       └── index.html
 ├── requirements.txt
+├── setup.bash
 └── README.md
 ```
 
@@ -28,17 +30,17 @@ flask-api-app
 
 2. **Create a virtual environment:**
    ```bash
-   python -m venv venv
+   python3 -m venv .venv
    ```
 
 3. **Activate the virtual environment:**
    - On Windows:
      ```bash
-     venv\Scripts\activate
+     .venv\Scripts\activate
      ```
    - On macOS/Linux:
      ```bash
-     source venv/bin/activate
+     source .venv/bin/activate
      ```
 
 4. **Install the required dependencies:**

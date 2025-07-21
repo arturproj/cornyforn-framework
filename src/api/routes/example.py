@@ -5,9 +5,9 @@ router_bp_example = Blueprint('example', __name__, url_prefix='/example')
 @router_bp_example.get('/example')
 def example_route():
     """GET /api/v1/example/
-    Example route that returns a simple message.
+    Example route that returns a simple msg.
     """
-    return jsonify({"message": "This is an example route."})
+    return jsonify({"msg": "This is an example route."})
 
 @router_bp_example.post('/example')
 @jwt_required()
@@ -17,7 +17,7 @@ def create_example():
     Requires JWT authentication.
     """
     data = request.get_json()
-    return jsonify({"message": "Example created.", "data": data}), 201
+    return jsonify({"msg": "Example created.", "data": data}), 201
 
 @router_bp_example.get('/example/<int:id>')
 @jwt_required()
@@ -28,7 +28,7 @@ def get_example(id: int):
     """
     # In a real application, you would fetch the resource from the database
     # Here we just return a dummy response
-    return jsonify({"message": f"Retrieved example with id {id}."})
+    return jsonify({"msg": f"Retrieved example with id {id}."})
 
 @router_bp_example.delete('/example/<int:id>')
 @jwt_required()
@@ -37,4 +37,4 @@ def delete_example(id: int):
     Example route to delete an example resource by ID.
     Requires JWT authentication.
     """
-    return jsonify({"message": f"Deleted example with id {id}."})
+    return jsonify({"msg": f"Deleted example with id {id}."})

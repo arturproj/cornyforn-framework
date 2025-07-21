@@ -5,7 +5,7 @@ router_bp_authorization = Blueprint('authorization', __name__)
 
 @router_bp_authorization.post('/login')
 def login():
-    """POST /api/login
+    """POST /api/v1/auth/login
     Example route to log in a user and return JWT tokens.
     """
     # Here you would typically verify user credentials
@@ -19,7 +19,7 @@ def login():
 @router_bp_authorization.post('/refresh')
 @jwt_required(refresh=True)
 def refresh():
-    """POST /api/refresh
+    """POST /api/v1/auth/refresh
     Example route to refresh the access token using a refresh token.
     Requires JWT authentication.
     """
@@ -28,14 +28,18 @@ def refresh():
         new_access_token = create_access_token(identity=current_user)
         return jsonify(access_token=new_access_token), 200
     except:
-        return jsonify({'message': 'Invalid token!'}), 403
+        return jsonify({'msg': 'Invalid token!'}), 403
 
 
-# @router_bp_authorization.post('/logout')
-# @jwt_required()
-# def logout():
-#     jti = get_jwt()["jti"]
-#     jwt_blacklist = current_app.config.get('jwt_blacklist', set())
-#     jwt_blacklist.add(jti)
-#     current_app.config.update(jwt_blacklist=jwt_blacklist)
-#     return jsonify({'message': "Token revoked"}), 200
+@router_bp_authorization.route('/logout', methods=['GET', 'POST'])
+@jwt_required()
+def logout():
+    """GET /api/v1/auth/logout
+    Example route to log out a user by revoking the JWT token.
+    Requires JWT authentication.
+    """
+    jti = get_jwt()["jti"]
+    jwt_blacklist = current_app.config.get('jwt_blacklist', set())
+    jwt_blacklist.add(jti)
+    current_app.config.update(jwt_blacklist=jwt_blacklist)
+    return jsonify({'msg': "Token revoked"}), 200
