@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Welcome API</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Ubuntu Mono, sans-serif;
+            margin: 20px;
+        }
+
+        tbody {
+            tr:nth-child(even) {
+                background-color: #D6EEEE;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to the API!</h1>
+    <p>This API provides various endpoints for demonstration purposes.</p>
+    <p>Below is a list of available endpoints:</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: left;">Endpoint</th>
+                <th style="text-align: left;">Route</th>
+                <th style="text-align: left;">Methods</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for route in routes %}
+            <tr>
+                <td style="width: 20%;">{{ route.endpoint }}</td>
+                <td style="width: 70%;">{{ route.url }}</td>
+                <td style="width: 10%;">{{ route.methods| sort | join(', ') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
