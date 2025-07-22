@@ -1,13 +1,16 @@
-from flask import Flask, render_template, jsonify
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt
+from flask import Flask
+from flask_swagger import swagger
+from flask_jwt_extended import JWTManager
 from api import api
 # from api.routes import example
 # from api.routes.example import router_bp_example
 from datetime import timedelta
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
+from models.extensions import db
 
 import os
+# Initialize SQLAlchemy with a custom base class
+from models.Example import Example
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -38,9 +41,11 @@ def create_app():
         JWT_REFRESH_TOKEN_EXPIRES=timedelta(seconds=int(os.getenv(
             'JWT_REFRESH_TOKEN_EXPIRES', 86400))),        # Enable token blacklist
 
+        SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://localhost:3306/test'),
         # Add other configurations here
-        # ... e.g., database URI, etc.
+        # ... e.g., etc.
     )
+
     # Initialize JWT Manager
     jwt = JWTManager(app) 
     # Make blacklist available in the app context
@@ -75,22 +80,14 @@ def create_app():
 
 
 app = create_app()
+db.init_app(app)  # Initialize SQLAlchemy with the Flask app
 
 
-# Initialize default routes
-@app.get('/')
-def index():
-    routes = []
-    for rule in app.url_map.iter_rules():
-        if rule.endpoint in ['index']:
-            continue
-        routes.append({
-            "url": str(rule),
-            "methods": list(rule.methods),
-            "endpoint": rule.endpoint,
-        })
-    return render_template("index.html", routes=routes)
-
-
+# Run the application
 if __name__ == "__main__":
+    # with app.app_context():
+    # # Create all tables in the database
+    #     Example.metadata.create_all(db.engine)
+
     app.run(debug=True)
+
