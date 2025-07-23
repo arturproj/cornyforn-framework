@@ -1,7 +1,21 @@
+from flask.views import View
 from flask import Blueprint, jsonify, request, url_for
 from flask_jwt_extended import jwt_required
 
 router_bp_other = Blueprint('other', __name__)
+
+
+class OtherView(View):
+    """Base class for other views."""
+    methods = ['GET']
+
+    def __init__(self, model, template):
+        self.model = model
+        self.template = template
+
+    def dispatch_request(self, *args, **kwargs):
+        return jsonify({"msg": "This is a base view for other routes."})
+
 
 # Define your API routes here
 @router_bp_other.route('/other', methods=['GET'])
@@ -10,6 +24,7 @@ def other_route():
     Other route that returns a simple msg.
     """
     return jsonify({"msg": "This is an other route."})
+
 
 @router_bp_other.route('/other', methods=['POST'])
 @jwt_required()
@@ -21,6 +36,7 @@ def create_other():
     data = request.get_json()
     return jsonify({"msg": "Other created.", "data": data}), 201
 
+
 @router_bp_other.route('/other/<int:id>', methods=['GET'])
 @jwt_required()
 def get_other(id):
@@ -29,6 +45,7 @@ def get_other(id):
     Requires JWT authentication.
     """
     return jsonify({"msg": f"Retrieved other with id {id}."})
+
 
 @router_bp_other.route('/other/<int:id>', methods=['DELETE'])
 @jwt_required()

@@ -27,6 +27,7 @@ def create_example():
     data = request.get_json()
     if 'message' not in data:
         return jsonify({"msg": "Missing 'message' field."}), 400
+    
     new_example = Example(message=data['message'])
 
     current_app.extensions['sqlalchemy'].session.add(new_example)
@@ -48,6 +49,27 @@ def get_example(id: int):
         return jsonify({"msg": "Example not found."}), 404
     serialized = example.as_dict()
     return jsonify(serialized), 200
+
+
+@router_bp_example.put('/example/<int:id>')
+@jwt_required()
+def update_example(id: int):
+    """PUT /api/v1/example/<id>
+    Example route to update an example resource by ID.
+    Requires JWT authentication.
+    """
+    example = Example.query.get(id)
+    if not example:
+        return jsonify({"msg": "Example not found."}), 404
+
+    data = request.get_json()
+    if 'message' in data:
+        example.message = data['message']
+
+    current_app.extensions['sqlalchemy'].session.commit()
+    current_app.extensions['sqlalchemy'].session.refresh(example)
+
+    return jsonify({"msg": "Example updated.", "data": example.as_dict()}), 200
 
 
 @router_bp_example.delete('/example/<int:id>')

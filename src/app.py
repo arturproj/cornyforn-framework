@@ -6,13 +6,12 @@ from api import api
 # from api.routes.example import router_bp_example
 from datetime import timedelta
 from dotenv import load_dotenv
-from models.extensions import db
-
+from services.database import db
+# from models.Example import Example
 import os
-# Initialize SQLAlchemy with a custom base class
-from models.Example import Example
 
-load_dotenv()  # Load environment variables from .env file
+# Load environment variables from .env file
+load_dotenv()
 
 
 def create_app():
