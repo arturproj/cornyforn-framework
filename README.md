@@ -9,9 +9,11 @@ This is a simple Flask API application that demonstrates how to structure a Flas
 │   ├── app.py
 │   ├── api
 │   │   ├── __init__.py
-│   │   └── routes
+│   │   └── controllers
 │   │       └── __init__.py
 │   ├── models
+│   |   └── __init__.py
+│   ├── services
 │   |   └── __init__.py
 │   └── templates
 │       └── index.html

@@ -1,6 +1,6 @@
-from .routes.other import router_bp_other
-from .routes.example import router_bp_example
-from .routes.authorization import router_bp_authorization
+from .controllers.other import router_bp_other
+from .controllers.example import router_bp_example
+from .controllers.authorization import router_bp_authorization
 from flask import Blueprint, current_app, render_template
 from flask.views import View
 
@@ -22,7 +22,7 @@ class ApiListViewContoller(View):
                 "methods": list(rule.methods),
                 "endpoint": rule.endpoint,
             } for rule in current_app.url_map.iter_rules()
-            if rule.endpoint != 'api.index'
+            if rule.endpoint not in ['static', 'index', 'api.index']
         ]
         return render_template(self.template, routes=items)
 

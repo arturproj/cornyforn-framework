@@ -1,20 +1,7 @@
-from flask.views import View
-from flask import Blueprint, jsonify, request, url_for
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 
 router_bp_other = Blueprint('other', __name__)
-
-
-class OtherView(View):
-    """Base class for other views."""
-    methods = ['GET']
-
-    def __init__(self, model, template):
-        self.model = model
-        self.template = template
-
-    def dispatch_request(self, *args, **kwargs):
-        return jsonify({"msg": "This is a base view for other routes."})
 
 
 # Define your API routes here
