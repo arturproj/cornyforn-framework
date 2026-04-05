@@ -32,7 +32,8 @@ def create_example():
 
     current_app.extensions['sqlalchemy'].session.add(new_example)
     current_app.extensions['sqlalchemy'].session.commit()
-    current_app.extensions['sqlalchemy'].session.refresh(new_example)
+    # Ensure all fields are populated by re-querying
+    new_example = current_app.extensions['sqlalchemy'].session.get(Example, new_example.id)
 
     return jsonify({"msg": "Example created.", "data": new_example.as_dict()}), 201
 
