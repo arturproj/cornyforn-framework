@@ -1,4 +1,3 @@
-from .controllers.other import router_bp_other
 from .controllers.example import router_bp_example
 from .controllers.authorization import router_bp_authorization
 from flask import Blueprint, current_app, render_template
@@ -34,5 +33,3 @@ api.add_url_rule(
 api.register_blueprint(router_bp_authorization, url_prefix='/v1/auth')
 
 api.register_blueprint(router_bp_example, url_prefix='/v1')
-
-api.register_blueprint(router_bp_other, url_prefix='/v1')

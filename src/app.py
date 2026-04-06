@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, url_for
 # from api.controllers import example
 # from api.controllers.example import router_bp_example
@@ -11,7 +12,16 @@ from models.Example import Example
 
 
 # Load environment variables from .env file
+# Load the base .env file first
 load_dotenv()
+
+# Conditionally load .env.local for development or .env.prod for production
+APP_ENVIRONMENT = os.getenv("APP_DEBUG") == "True"
+
+if APP_ENVIRONMENT:
+    load_dotenv('.env.local')
+else:
+    load_dotenv('.env.prod')
 
 app = create_app(__name__)
 # Initialize the database

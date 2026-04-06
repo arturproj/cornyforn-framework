@@ -13,7 +13,7 @@ def create_app(namespace=__name__):
         DEBUG=os.getenv('APP_DEBUG', True),  # Set to True for development
         TESTING=os.getenv('APP_TESTING', False),  # Set to True for testing
         # Change this to a secure key
-        SECRET_KEY=os.getenv('SECRET_KEY', 'your_secret_key'),
+        SECRET_KEY=os.getenv('APP_SECRET_KEY', 'your_secret_key'),
         # Change this to a secure key
         JWT_SECRET_KEY=os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key'),
         # Token expiration time in seconds
