@@ -19,9 +19,9 @@ load_dotenv()
 APP_ENVIRONMENT = os.getenv("APP_DEBUG") == "True"
 
 if APP_ENVIRONMENT:
-    load_dotenv('.env.local')
+    load_dotenv('.env.local', override=True)
 else:
-    load_dotenv('.env.prod')
+    load_dotenv('.env.prod', override=True)
 
 app = create_app(__name__)
 # Initialize the database

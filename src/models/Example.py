@@ -40,15 +40,15 @@ def soft_update(mapper, connection, target):
     )
 
 # Optional: event to set deletedAt to "soft delete"
-@event.listens_for(Example, 'before_delete')
-def soft_delete(mapper, connection, target):
-    # Prevents physical deletion
-    if target.deletedAt is None:
-        connection.execute(
-            Example.__table__.update()
-            .where(Example.id == target.id)
-            .values(deletedAt=func.now())
-        )
-    else:
-        raise Exception(
-            "Soft delete only: the record was not physically deleted")
+# @event.listens_for(Example, 'before_delete')
+# def soft_delete(mapper, connection, target):
+#     # Prevents physical deletion
+#     if target.deletedAt is None:
+#         connection.execute(
+#             Example.__table__.update()
+#             .where(Example.id == target.id)
+#             .values(deletedAt=func.now())
+#         )
+#     else:
+#         raise Exception(
+#             "Soft delete only: the record was not physically deleted")
