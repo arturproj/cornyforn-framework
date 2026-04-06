@@ -17,6 +17,7 @@ This is a simple Flask API application that demonstrates how to structure a Flas
 │   |   └── __init__.py
 │   └── templates
 │       └── index.html
+├── .env
 ├── requirements.txt
 ├── setup.bash
 └── README.md
