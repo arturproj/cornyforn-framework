@@ -32,4 +32,4 @@ api.add_url_rule(
 
 api.register_blueprint(router_bp_authorization, url_prefix='/v1/auth')
 
-api.register_blueprint(router_bp_example, url_prefix='/v1')
+api.register_blueprint(router_bp_example, url_prefix='/v1/examples')
