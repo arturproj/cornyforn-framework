@@ -8,11 +8,11 @@ router_bp_example = Blueprint('example', __name__)
 
 def active_examples_helper():
     """Return query scoped to non-deleted rows."""
-    return Example.query.filter(Example.deletedAt.is_(None))
+    return db.session.query(Example).filter(Example.deletedAt.is_(None))
 
 def desactive_examples_helper():
     """Return query scoped to soft-deleted rows."""
-    return Example.query.filter(Example.deletedAt.isnot(None))
+    return db.session.query(Example).filter(Example.deletedAt.isnot(None))
 
 @router_bp_example.get('')
 def get_examples():

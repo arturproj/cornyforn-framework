@@ -2,26 +2,42 @@ from services.database import db, Base
 from datetime import datetime
 from sqlalchemy.sql import func
 
-class Example(db.Model, Base):
-    id: int
-    message: str
-    createdAt: datetime
-    updatedAt: datetime
-    deletedAt: datetime
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
 
+class ExampleModel:
+    id: Mapped[int]
+    message: Mapped[str]
+    createdAt: Mapped[datetime]
+    updatedAt: Mapped[datetime]
+    deletedAt: Mapped[datetime]
+
+class Example(ExampleModel, Base):
     __tablename__ = 't_examples'
 
-    id = db.Column(db.Integer,
-                   primary_key=True,
-                   autoincrement=True,
-                   nullable=False,
-                   unique=True)
-    message = db.Column(db.Text)
+    id: Mapped[int] = mapped_column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+        nullable=False,
+        unique=True
+    )
+    message: Mapped[str] = mapped_column(db.Text)
 
-    createdAt = db.Column(db.DateTime, nullable=False,
-                          default=func.now())
-    updatedAt = db.Column(db.DateTime, nullable=True,
-                          default=None, onupdate=func.now())
-    deletedAt = db.Column(db.DateTime, nullable=True,
-                          default=None)
+    createdAt: Mapped[datetime] = mapped_column(
+        db.DateTime,
+        nullable=False,
+        default=func.now()
+    )
+    updatedAt: Mapped[datetime] = mapped_column(
+        db.DateTime,
+        nullable=True,
+        default=None,
+        onupdate=func.now()
+    )
+    deletedAt: Mapped[datetime] = mapped_column(
+        db.DateTime,
+        nullable=True,
+        default=None
+    )
 
