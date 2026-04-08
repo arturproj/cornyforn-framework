@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, url_for
+from flask import redirect, url_for
 # from api.controllers import example
 # from api.controllers.example import router_bp_example
 from dotenv import load_dotenv
@@ -8,8 +8,6 @@ from services.database import db
 # Create the Flask application
 # It can be used to set the name of the application in the Flask context
 from services.application import create_app
-from models.Example import Example
-
 
 # Load environment variables from .env file
 # Load the base .env file first
@@ -34,7 +32,7 @@ def index():
 # Run the application
 if __name__ == "__main__":
     with app.app_context():
-    # Create all tables in the database
-        Example.metadata.create_all(db.engine)
+        # Create all tables in the database
+        db.create_all()
 
     app.run(debug=True)

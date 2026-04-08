@@ -1,6 +1,5 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from sqlalchemy import select
 from models.Example import Example
 from datetime import datetime
 from services.database import db
@@ -11,6 +10,10 @@ def active_examples_helper():
     """Return query scoped to non-deleted rows."""
     return Example.query.filter(Example.deletedAt.is_(None))
 
+def desactive_examples_helper():
+    """Return query scoped to soft-deleted rows."""
+    return Example.query.filter(Example.deletedAt.isnot(None))
+
 @router_bp_example.get('/')
 def get_examples():
     """GET /api/v1/examples/
@@ -19,10 +22,10 @@ def get_examples():
     It returns a list of example resources in JSON format.
     """
     # setup pagination
-    page = int(request.args.get('page', 0)) - 1
+    page = int(request.args.get('page', 1)) - 1
     limit = int(request.args.get('limit', 30))
 
-    examples = active_examples_helper().order_by(Example.createdAt.desc()).offset(page * limit).limit(limit).all()
+    examples = active_examples_helper().offset(page * limit).limit(limit).all()
     return jsonify([e.as_dict() for e in examples]), 200
 
 
@@ -41,8 +44,6 @@ def create_example():
 
     db.session.add(new_example)
     db.session.commit()
-    # Ensure all fields are populated by re-querying
-    new_example = db.session.get(Example, new_example.id)
 
     return jsonify({"success": "Example created.", "data": new_example.as_dict()}), 201
 
@@ -57,8 +58,8 @@ def get_example(id: int):
     example = active_examples_helper().filter_by(id=id).first()
     if not example:
         return jsonify({"error": "Example not found."}), 404
-    serialized = example.as_dict()
-    return jsonify(serialized), 200
+    
+    return jsonify({"data": example.as_dict()}), 200
 
 
 @router_bp_example.put('/<int:id>')
@@ -68,7 +69,7 @@ def update_example(id: int):
     Example route to update an example resource by ID.
     Requires JWT authentication.
     """
-    example = Example.query.get(id)
+    example = active_examples_helper().filter_by(id=id).first()
     if not example:
         return jsonify({"error": "Example not found."}), 404
 
@@ -89,7 +90,7 @@ def soft_delete_example(id: int):
     Example route to delete an example resource by ID.
     Requires JWT authentication.
     """
-    example = Example.query.get(id)
+    example = active_examples_helper().filter_by(id=id).first()
     if not example:
         return jsonify({"error": "Example not found."}), 404
 
@@ -109,7 +110,7 @@ def delete_example_permanently(id: int):
     Example route to delete an example resource by ID.
     Requires JWT authentication.
     """
-    example = Example.query.get(id)
+    example = desactive_examples_helper().filter_by(id=id).first()
     if not example:
         return jsonify({"error": "Example not found."}), 404
 
