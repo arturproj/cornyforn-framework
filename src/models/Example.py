@@ -5,14 +5,14 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-class ExampleSchema:
+class ExampleModel:
     id: Mapped[int]
     message: Mapped[str]
     createdAt: Mapped[datetime]
     updatedAt: Mapped[datetime]
     deletedAt: Mapped[datetime]
 
-class Example(ExampleSchema, Base):
+class Example(ExampleModel, Base):
     __tablename__ = 't_examples'
 
     id: Mapped[int] = mapped_column(
@@ -22,7 +22,10 @@ class Example(ExampleSchema, Base):
         nullable=False,
         unique=True
     )
-    message: Mapped[str] = mapped_column(db.Text)
+    message: Mapped[str] = mapped_column(
+        db.Text,
+        nullable=False
+    )
 
     createdAt: Mapped[datetime] = mapped_column(
         db.DateTime,
