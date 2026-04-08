@@ -1,5 +1,5 @@
 import os
-from flask import redirect, url_for
+from flask import redirect, render_template, url_for
 # from api.controllers import example
 # from api.controllers.example import router_bp_example
 from dotenv import load_dotenv
@@ -27,7 +27,20 @@ db.init_app(app)  # Initialize SQLAlchemy with the Flask app
 
 @app.route('/')
 def index():
-    return redirect(url_for('api.index'))  # Redirect to the API index page
+    return redirect(url_for('docs'))  # Redirect to the API index page
+
+@app.route('/api')
+def api_index():
+    return redirect(url_for('docs'))  # Redirect to the API index page
+
+@app.get('/api/docs')
+def docs():
+    """GET /api/docs
+    Render the API documentation page.
+    This route does not require authentication.
+    It returns an HTML page with a list of all available API routes.
+    """
+    return render_template('api/docs.html')
 
 # Run the application
 if __name__ == "__main__":

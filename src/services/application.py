@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flasgger import Flasgger
 from api import api
 from datetime import timedelta
 
@@ -52,6 +53,47 @@ def create_app(namespace=__name__):
         jti = jwt_payload["jti"]
         # Check if the token ID is in the blacklist
         return jti in app.config['jwt_blacklist']
+
+    # Initialize Flasgger for Swagger UI
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": 'apispec',
+                "route": '/apispec.json',
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/api/docs"
+    }
+    
+    swagger_template = {
+        "swagger": "2.0",
+        "info": {
+            "title": "Cornyforn API",
+            "description": "API for example resource management with JWT authentication",
+            "version": "1.0.0",
+            "contact": {
+                "name": "API Support"
+            }
+        },
+        "host": os.getenv('API_HOST', 'localhost:5000'),
+        "basePath": "/api",
+        "schemes": [os.getenv('API_SCHEME', 'http')],
+        "securityDefinitions": {
+            "Bearer": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+            }
+        }
+    }
+    
+    Flasgger(app, config=swagger_config, template=swagger_template)
 
 # Register the APIs blueprint
     app.register_blueprint(api)
