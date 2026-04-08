@@ -5,14 +5,14 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-class ExampleModel:
+class ExampleSchema:
     id: Mapped[int]
     message: Mapped[str]
     createdAt: Mapped[datetime]
     updatedAt: Mapped[datetime]
     deletedAt: Mapped[datetime]
 
-class Example(ExampleModel, Base):
+class Example(ExampleSchema, Base):
     __tablename__ = 't_examples'
 
     id: Mapped[int] = mapped_column(
