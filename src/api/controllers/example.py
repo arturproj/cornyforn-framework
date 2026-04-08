@@ -14,9 +14,9 @@ def desactive_examples_helper():
     """Return query scoped to soft-deleted rows."""
     return Example.query.filter(Example.deletedAt.isnot(None))
 
-@router_bp_example.get('/')
+@router_bp_example.get('')
 def get_examples():
-    """GET /api/v1/examples/
+    """GET /api/v1/examples
     Example route to retrieve a list of examples.
     This route does not require authentication.
     It returns a list of example resources in JSON format.
@@ -29,10 +29,10 @@ def get_examples():
     return jsonify([e.as_dict() for e in examples]), 200
 
 
-@router_bp_example.post('/')
+@router_bp_example.post('')
 @jwt_required()
 def create_example():
-    """POST /api/v1/examples/
+    """POST /api/v1/examples
     Example route to create a new example resource.
     Requires JWT authentication.
     """
