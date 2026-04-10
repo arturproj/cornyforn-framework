@@ -9,112 +9,119 @@ from flasgger import swag_from
 router_bp_example = Blueprint('example', __name__)
 
 def active_examples_helper():
-    """Return query scoped to non-deleted rows."""
-    return db.session.query(Example).filter(Example.deletedAt.is_(None))
+  """Return query scoped to non-deleted rows."""
+  return db.session.query(Example).filter(Example.deletedAt.is_(None))
 
 def desactive_examples_helper():
-    """Return query scoped to soft-deleted rows."""
-    return db.session.query(Example).filter(Example.deletedAt.isnot(None))
+  """Return query scoped to soft-deleted rows."""
+  return db.session.query(Example).filter(Example.deletedAt.isnot(None))
 
 @router_bp_example.get('')
 @swag_from('docs/example/get_examples.yaml')
 def get_examples():
-    """
-    Get all active examples with pagination
-    """
-    # setup pagination
-    page = int(request.args.get('page', 1)) - 1
-    limit = int(request.args.get('limit', 30))
+  """GET /api/v1/examples/
+  Example route to retrieve a list of examples.
+  This route does not require authentication.
+  It returns a list of example resources in JSON format.
+  """
+  # setup pagination
+  page = int(request.args.get('page', 1)) - 1
+  limit = int(request.args.get('limit', 30))
 
-    examples = active_examples_helper().offset(page * limit).limit(limit).all()
-    return jsonify([e.as_dict() for e in examples]), 200
+  examples = active_examples_helper().offset(page * limit).limit(limit).all()
+  return jsonify([e.as_dict() for e in examples]), 200
 
 
 @router_bp_example.post('')
 @jwt_required()
 @swag_from('docs/example/create_example.yaml')
 def create_example():
-    """
-    Create a new example
-    """
-    data = request.get_json()
-    if 'message' not in data:
-        return jsonify({"error": "Missing 'message' field."}), 400
-    
-    new_example = Example(message=data['message'])
+  """POST /api/v1/examples/
+  Example route to create a new example resource.
+  Requires JWT authentication.
+  """
+  data = request.get_json()
+  if 'message' not in data:
+      return jsonify({"error": "Missing 'message' field."}), 400
+  
+  new_example = Example(message=data['message'])
 
-    db.session.add(new_example)
-    db.session.commit()
+  db.session.add(new_example)
+  db.session.commit()
 
-    return jsonify({"success": "Example created.", "data": new_example.as_dict()}), 201
+  return jsonify({"success": "Example created.", "data": new_example.as_dict()}), 201
 
 
 @router_bp_example.get('/<int:id>')
 @swag_from('docs/example/get_example.yaml')
 def get_example(id: int):
-    """
-    Get example by ID
-    """
-    example = active_examples_helper().filter_by(id=id).first()
-    if not example:
-        return jsonify({"error": "Example not found."}), 404
-    
-    return jsonify({"data": example.as_dict()}), 200
+  """GET /api/v1/example/<id>
+  Example route to retrieve an example resource by ID.
+  This route does not require authentication.
+  It returns the example resource in JSON format if found, otherwise a 404 error.
+  """
+  example = active_examples_helper().filter_by(id=id).first()
+  if not example:
+      return jsonify({"error": "Example not found."}), 404
+
+  return jsonify({"data": example.as_dict()}), 200
 
 
 @router_bp_example.put('/<int:id>')
 @jwt_required()
 @swag_from('docs/example/update_example.yaml')
 def update_example(id: int):
-    """
-    Update example by ID
-    """
-    example = active_examples_helper().filter_by(id=id).first()
-    if not example:
-        return jsonify({"error": "Example not found."}), 404
+  """PUT /api/v1/example/<id>
+  Example route to update an example resource by ID.
+  Requires JWT authentication.
+  """
+  example = active_examples_helper().filter_by(id=id).first()
+  if not example:
+      return jsonify({"error": "Example not found."}), 404
 
-    data = request.get_json()
-    if not data or "message" not in data:
-        return jsonify({"error": "'message' field is required"}), 400
-    
-    example.message = data['message']
-    db.session.commit()
+  data = request.get_json()
+  if not data or "message" not in data:
+      return jsonify({"error": "'message' field is required"}), 400
+  
+  example.message = data['message']
+  db.session.commit()
 
-    return jsonify({"success": "Example updated.", "data": example.as_dict()}), 200
+  return jsonify({"success": "Example updated.", "data": example.as_dict()}), 200
 
 
 @router_bp_example.delete('/<int:id>')
 @jwt_required()
 @swag_from('docs/example/soft_delete_example.yaml')
 def soft_delete_example(id: int):
-    """
-    Soft delete example by ID
-    """
-    example = active_examples_helper().filter_by(id=id).first()
-    if not example:
-        return jsonify({"error": "Example not found."}), 404
+  """DELETE /api/v1/example/<id>
+  Example route to delete an example resource by ID.
+  Requires JWT authentication.
+  """
+  example = active_examples_helper().filter_by(id=id).first()
+  if not example:
+      return jsonify({"error": "Example not found."}), 404
 
-    example.deletedAt = datetime.now()  # Soft delete
-    db.session.commit()
+  example.deletedAt = datetime.now()  # Soft delete
+  db.session.commit()
 
-    if example.deletedAt:
-        return jsonify({"success": "Example soft-deleted.", "data": example.as_dict()}), 200
-    else:
-        return jsonify({"error": "Example not soft-deleted."}), 500
+  if example.deletedAt:
+      return jsonify({"success": "Example soft-deleted.", "data": example.as_dict()}), 200
+  else:
+      return jsonify({"error": "Example not soft-deleted."}), 500
 
 
 @router_bp_example.delete('/<int:id>/prune')
 @jwt_required()
 def delete_example_permanently(id: int):
-    """DELETE /api/v1/examples/<id>/prune
-    Example route to delete an example resource by ID.
-    Requires JWT authentication.
-    """
-    example = desactive_examples_helper().filter_by(id=id).first()
-    if not example:
-        return jsonify({"error": "Example not found."}), 404
+  """DELETE /api/v1/examples/<id>/prune
+  Example route to delete an example resource by ID.
+  Requires JWT authentication.
+  """
+  example = desactive_examples_helper().filter_by(id=id).first()
+  if not example:
+      return jsonify({"error": "Example not found."}), 404
 
-    db.session.delete(example)
-    db.session.commit()
+  db.session.delete(example)
+  db.session.commit()
 
-    return jsonify({"sucess": "Example permanently deleted."}), 200
+  return jsonify({"sucess": "Example permanently deleted."}), 200
