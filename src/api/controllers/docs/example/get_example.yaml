@@ -1,0 +1,42 @@
+summary: Retrieve a resource by ID
+tags:
+  - Examples
+parameters:
+  - name: id
+    in: path
+    type: integer
+    required: true
+    description: Example ID
+responses:
+  200:
+    description: Example found
+    schema:
+      type: object
+      properties:
+        success:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            message:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            deletedAt:
+              type: string
+              format: date-time
+  404:
+    description: Example not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+  401:
+    description: Unauthorized - missing or invalid token

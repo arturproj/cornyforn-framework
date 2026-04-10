@@ -1,0 +1,30 @@
+tags:
+  - Authentication
+summary: Revoke JWT token and logout user
+description: Revoke the current JWT token by adding it to the blacklist
+security:
+  - Bearer: []
+responses:
+  200:
+    description: Token revoked successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean                  
+              description: Logout success status
+            message:                  
+              type: string
+              description: Logout confirmation message
+  401:
+    description: Invalid or missing token
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Error message

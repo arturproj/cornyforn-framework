@@ -1,0 +1,39 @@
+tags:
+  - Authentication
+summary: Generate new access token using refresh token
+description: Generate a new access token using a valid refresh token
+security:
+  - Bearer: []
+responses:
+  200:
+    description: New access token generated
+    schema:
+        type: object
+        properties:
+            access_token:
+                type: string
+                description: New JWT access token
+  401:
+    description: Invalid or expired refresh token
+    schema:
+        type: object
+        properties:
+            msg:
+                type: string
+                description: Error message
+  403:
+    description: Token validation failed
+    schema:
+        type: object
+        properties:
+            msg:
+                type: string
+                description: Error message
+  422:
+    description: UNPROCESSABLE ENTITY
+    schema:
+        type: object
+        properties:
+            msg:
+                type: string
+                description: Error message

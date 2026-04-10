@@ -5,15 +5,16 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-class ExampleModel:
+class UserModel:
     id: Mapped[int]
-    message: Mapped[str]
+    username: Mapped[str]
+    password: Mapped[str]
     createdAt: Mapped[datetime]
     updatedAt: Mapped[datetime]
     deletedAt: Mapped[datetime]
 
-class Example(ExampleModel, Base):
-    __tablename__ = 't_examples'
+class User(UserModel, Base):
+    __tablename__ = 't_users'
 
     id: Mapped[int] = mapped_column(
         db.Integer,
@@ -22,8 +23,13 @@ class Example(ExampleModel, Base):
         nullable=False,
         unique=True
     )
-    message: Mapped[str] = mapped_column(
-        db.Text,
+    username: Mapped[str] = mapped_column(
+        db.String(100),
+        nullable=False,
+        unique=True
+    )
+    password: Mapped[str] = mapped_column(
+        db.String(255),
         nullable=False
     )
 

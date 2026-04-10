@@ -1,0 +1,52 @@
+summary: Updating a resource by ID
+tags:
+  - Examples
+security:
+  - Bearer: []
+parameters:
+  - name: id
+    in: path
+    type: integer
+    required: true
+    description: Example ID
+  - name: body
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Updated message content
+responses:
+  200:
+    description: Example updated successfully
+    schema:
+      type: object
+      properties:
+        success:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            message:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            deletedAt:
+              type: string
+              format: date-time
+  400:
+    description: Invalid request - missing message field
+  404:
+    description: Example not found
+  401:
+    description: Unauthorized - missing or invalid token
