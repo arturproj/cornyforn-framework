@@ -1,0 +1,44 @@
+  tags:
+    - Authentication
+  summary: Authenticate user and return JWT tokens
+  description: Authenticate user with username and password, returning JWT access and refresh tokens
+  parameters:
+    - name: body
+      in: body
+      required: true
+      schema:
+        type: object
+        required:
+          - username
+          - password
+        properties:
+          username:
+            type: string
+            description: Unique username for the user
+          password:
+            type: string
+            description: Password for the user account
+  responses:
+    201:
+      description: Login successful, tokens issued
+      schema:
+        type: object
+        properties:
+          access_token:
+            type: string
+          refresh_token:
+            type: string
+    400:
+      description: Missing required fields
+      schema:
+          type: object
+          properties:
+              error:
+                  type: string
+    401:
+      description: Invalid username or password
+      schema:
+          type: object
+          properties:
+              error:
+                  type: string

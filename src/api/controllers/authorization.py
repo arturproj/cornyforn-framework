@@ -4,48 +4,17 @@ from models.User import User
 from services.database import db
 import hashlib
 
+from flasgger import swag_from
+
 router_bp_authorization = Blueprint('authorization', __name__)
 
-@router_bp_authorization.post('/create')
+@router_bp_authorization.route('/create',methods=['POST'])
+@swag_from('docs/user/create_user.yaml')
 def create_user():
-    """
-    Create a new User
-    ---
-    tags:
-      - Authentication
-    summary: Register a new user account
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required:
-            - username
-            - password
-          properties:
-            username:
-              type: string
-              description: Unique username for the user
-            password:
-              type: string
-              description: Password for the user account
-    responses:
-      201:
-        description: User created successfully
-        schema:
-          type: object
-          properties:
-              msg:
-                  type: string
-                  description: Success message
-      400:
-        description: Missing required fields
-        schema:
-            type: object
-            properties:
-                error:
-                    type: string
+    """POST /api/v1/auth/create
+    Create a new user account.
+    This route accepts a JSON payload with 'username' and 'password' fields.
+    It creates a new user in the database with the provided credentials.
     """
     data = request.get_json()
     if 'username' not in data or 'password' not in data:
@@ -57,57 +26,16 @@ def create_user():
     db.session.add(user)
     db.session.commit()
     # Here you would typically create the user in your database
-    return jsonify({'msg': 'User created successfully'}), 201
+    return jsonify({'success': 'User created successfully'}), 201
                             
-@router_bp_authorization.post('/login')
+@router_bp_authorization.route('/login', methods=['POST'])
+@swag_from('docs/authorization/login_user.yaml')
 def login():
-    """
-    User login
-    ---
-    tags:
-      - Authentication
-    summary: Authenticate user and return JWT tokens
-    description: Authenticate user with username and password, returning JWT access and refresh tokens
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required:
-            - username
-            - password
-          properties:
-            username:
-              type: string
-              description: Unique username for the user
-            password:
-              type: string
-              description: Password for the user account
-    responses:
-      201:
-        description: Login successful, tokens issued
-        schema:
-          type: object
-          properties:
-            access_token:
-              type: string
-            refresh_token:
-              type: string
-      400:
-        description: Missing required fields
-        schema:
-            type: object
-            properties:
-                error:
-                    type: string
-      401:
-        description: Invalid username or password
-        schema:
-            type: object
-            properties:
-                error:
-                    type: string
+    """POST /api/v1/auth/login
+    User login to obtain JWT tokens.
+    This route accepts a JSON payload with 'username' and 'password' fields.
+    It verifies the credentials and returns an access token and a refresh token if valid.
+    Otherwise, it returns an error message.
     """
     # Here you would typically verify user credentials
     data = request.get_json()
@@ -121,48 +49,18 @@ def login():
         return jsonify({"error": "Invalid username or password."}), 401
 
     # For demonstration, we create a token for a user
-    access_token = create_access_token(identity=[user.id, user.username])
-    refresh_token = create_refresh_token(identity=[user.id, user.username])
+    access_token = create_access_token(identity=user.username)
+    refresh_token = create_refresh_token(identity=user.username)
     return jsonify(access_token=access_token, refresh_token=refresh_token), 201
 
 
 @router_bp_authorization.post('/refresh')
 @jwt_required(refresh=True)
+@swag_from('docs/authorization/refresh_token.yaml')
 def refresh():
-    """
-    Refresh access token
-    ---
-    tags:
-      - Authentication
-    summary: Generate new access token using refresh token
-    description: Generate a new access token using a valid refresh token
-    security:
-      - BearerAuth: []
-    responses:
-      200:
-        description: New access token generated
-        schema:
-            type: object
-            properties:
-                access_token:
-                    type: string
-                    description: New JWT access token
-      401:
-        description: Invalid or expired refresh token
-        schema:
-            type: object
-            properties:
-                msg:
-                    type: string
-                    description: Error message
-      403:
-        description: Token validation failed
-        schema:
-            type: object
-            properties:
-                msg:
-                    type: string
-                    description: Error message
+    """POST /api/v1/auth/refresh
+    Refresh the access token using a valid refresh token.
+    This route requires a valid refresh token and will return a new access token.
     """
     try:
         current_user = get_jwt_identity()
@@ -172,42 +70,16 @@ def refresh():
         return jsonify({'msg': 'Invalid token!'}), 403
 
 
-@router_bp_authorization.get('/logout')
+@router_bp_authorization.route('/logout', methods=['GET'])
 @jwt_required()
+@swag_from('docs/authorization/logout_user.yaml')
 def logout():
-    """
-    User logout
-    ---
-    tags:
-      - Authentication
-    summary: Revoke JWT token and logout user
-    description: Revoke the current JWT token by adding it to the blacklist
-    security:
-      - BearerAuth: []
-    responses:
-      200:
-        description: Token revoked successfully
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                msg:
-                  type: string
-                  description: Logout confirmation message
-      401:
-        description: Invalid or missing token
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                msg:
-                  type: string
-                  description: Error message
+    """GET /api/v1/auth/logout
+    User logout by revoking the current JWT token.
+    This route requires JWT authentication and will add the token's JTI to the blacklist.
     """
     jti = get_jwt()["jti"]
     jwt_blacklist = current_app.config.get('jwt_blacklist', set())
     jwt_blacklist.add(jti)
     current_app.config.update(jwt_blacklist=jwt_blacklist)
-    return jsonify({'msg': "Token revoked"}), 200
+    return jsonify({'success': True, "message": "Token revoked"}), 200
