@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flasgger import Flasgger
 from api import api
@@ -9,7 +10,8 @@ from datetime import timedelta
 def create_app(namespace=__name__):
     app = Flask(namespace)
 
-# Load configuration from a config file or environment variables
+    # Enable CORS for all routes
+    CORS(app)
     app.config.from_mapping(
         DEBUG=os.getenv('APP_DEBUG', True),  # Set to True for development
         TESTING=os.getenv('APP_TESTING', False),  # Set to True for testing
@@ -89,6 +91,80 @@ def create_app(namespace=__name__):
                 "name": "Authorization",
                 "in": "header",
                 "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+            }
+        },
+        "definitions": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": ["integer", "string"],
+                        "description": "Unique identifier for the user"
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": "Username of the user"
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Password for the user account"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp when the user was created"
+                    },
+                    "updatedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Timestamp when the user was last updated"
+                    },
+                    "deletedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Timestamp when the user was soft deleted (null if active)"
+                    }
+                }
+            },
+            "Example": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": ["integer", "string"],
+                        "description": "Unique identifier for the example"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The message content of the example"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp when the example was created"
+                    },
+                    "updatedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Timestamp when the example was last updated"
+                    },
+                    "deletedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Timestamp when the example was soft deleted (null if active)"
+                    }
+                }
             }
         }
     }

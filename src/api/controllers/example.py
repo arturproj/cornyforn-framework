@@ -4,6 +4,8 @@ from models.Example import Example
 from datetime import datetime
 from services.database import db
 
+from flasgger import swag_from
+
 router_bp_example = Blueprint('example', __name__)
 
 def active_examples_helper():
@@ -15,44 +17,10 @@ def desactive_examples_helper():
     return db.session.query(Example).filter(Example.deletedAt.isnot(None))
 
 @router_bp_example.get('')
+@swag_from('docs/example/get_examples.yaml')
 def get_examples():
     """
     Get all active examples with pagination
-    ---
-    tags:
-      - Examples
-    parameters:
-      - name: page
-        in: query
-        type: integer
-        default: 1
-        description: Page number for pagination
-      - name: limit
-        in: query
-        type: integer
-        default: 30
-        description: Number of items per page
-    responses:
-      200:
-        description: List of examples
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              message:
-                type: string
-              createdAt:
-                type: string
-                format: date-time
-              updatedAt:
-                type: string
-                format: date-time
-              deletedAt:
-                type: string
-                format: date-time
     """
     # setup pagination
     page = int(request.args.get('page', 1)) - 1
@@ -64,45 +32,10 @@ def get_examples():
 
 @router_bp_example.post('')
 @jwt_required()
+@swag_from('docs/example/create_example.yaml')
 def create_example():
     """
     Create a new example
-    ---
-    tags:
-      - Examples
-    security:
-      - Bearer: []
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required:
-            - message
-          properties:
-            message:
-              type: string
-              description: The message content for the example
-    responses:
-      201:
-        description: Example created successfully
-        schema:
-          type: object
-          properties:
-            success:
-              type: string
-            data:
-              type: object
-      400:
-        description: Missing required field
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized - missing or invalid token
     """
     data = request.get_json()
     if 'message' not in data:
@@ -117,38 +50,10 @@ def create_example():
 
 
 @router_bp_example.get('/<int:id>')
-@jwt_required()
+@swag_from('docs/example/get_example.yaml')
 def get_example(id: int):
     """
     Get example by ID
-    ---
-    tags:
-      - Examples
-    security:
-      - Bearer: []
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: Example ID
-    responses:
-      200:
-        description: Example found
-        schema:
-          type: object
-          properties:
-            data:
-              type: object
-      404:
-        description: Example not found
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized - missing or invalid token
     """
     example = active_examples_helper().filter_by(id=id).first()
     if not example:
@@ -159,47 +64,10 @@ def get_example(id: int):
 
 @router_bp_example.put('/<int:id>')
 @jwt_required()
+@swag_from('docs/example/update_example.yaml')
 def update_example(id: int):
     """
     Update example by ID
-    ---
-    tags:
-      - Examples
-    security:
-      - Bearer: []
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: Example ID
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required:
-            - message
-          properties:
-            message:
-              type: string
-              description: Updated message content
-    responses:
-      200:
-        description: Example updated successfully
-        schema:
-          type: object
-          properties:
-            success:
-              type: string
-            data:
-              type: object
-      400:
-        description: Invalid request - missing message field
-      404:
-        description: Example not found
-      401:
-        description: Unauthorized - missing or invalid token
     """
     example = active_examples_helper().filter_by(id=id).first()
     if not example:
@@ -217,36 +85,10 @@ def update_example(id: int):
 
 @router_bp_example.delete('/<int:id>')
 @jwt_required()
+@swag_from('docs/example/soft_delete_example.yaml')
 def soft_delete_example(id: int):
     """
     Soft delete example by ID
-    ---
-    tags:
-      - Examples
-    security:
-      - Bearer: []
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: Example ID
-    responses:
-      200:
-        description: Example soft-deleted successfully
-        schema:
-          type: object
-          properties:
-            success:
-              type: string
-            data:
-              type: object
-      404:
-        description: Example not found
-      500:
-        description: Error deleting example
-      401:
-        description: Unauthorized - missing or invalid token
     """
     example = active_examples_helper().filter_by(id=id).first()
     if not example:

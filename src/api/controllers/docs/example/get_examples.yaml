@@ -1,0 +1,35 @@
+summary: List of example resources
+tags:
+  - Examples
+parameters:
+  - name: page
+    in: query
+    type: integer
+    default: 1
+    description: Page number for pagination
+  - name: limit
+    in: query
+    type: integer
+    default: 30
+    description: Number of items per page
+responses:
+  200:
+    description: List of examples
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          message:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+          deletedAt:
+            type: string
+            format: date-time
